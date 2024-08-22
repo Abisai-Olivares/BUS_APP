@@ -3,11 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'data/repository/bus_repository.dart';
 import 'presentation/screens/bus_list_screen.dart';
 import 'presentation/cubit/bus_cubit.dart';
+import 'presentation/cubit/company_cubit.dart';
+import 'data/repository/company_repository.dart';
 
 void main() {
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -21,12 +22,20 @@ class MyApp extends StatelessWidget {
             apiUrl: 'https://vm703q5lua.execute-api.us-east-2.amazonaws.com/Prod/pets',
           ),
         ),
+        RepositoryProvider(
+          create: (context) => CompanyRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider<BusCubit>(
             create: (context) => BusCubit(
               busRepository: RepositoryProvider.of<BusRepository>(context),
+            ),
+          ),
+          BlocProvider<CompanyCubit>(
+            create: (context) => CompanyCubit(
+              companyRepository: RepositoryProvider.of<CompanyRepository>(context),
             ),
           ),
         ],
@@ -41,4 +50,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-  }
+}

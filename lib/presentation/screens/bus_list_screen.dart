@@ -6,8 +6,6 @@ import '../cubit/bus_state.dart';
 import 'edit_bus_screen.dart';
 import 'add_bus_screen.dart';
 
-
-
 class BusListView extends StatelessWidget {
   const BusListView({super.key});
 
@@ -15,46 +13,31 @@ class BusListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-  title: const Text('Autobuses CRUD'),
-  bottom: PreferredSize(
-    preferredSize: Size.fromHeight(40.0), // Ajusta el tamaño según sea necesario
-    child: Container(
-      alignment: Alignment.center,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(
-          'Ups, algo sucedió. Cuando realices una actualización o creación, utiliza el botón de actualizar autobuses.',
-          style: TextStyle(fontSize: 14.0),
-          textAlign: TextAlign.center,
+        title: const Text('Autobuses CRUD'),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(40.0), // Ajusta el tamaño según sea necesario
+          child: Container(
+            alignment: Alignment.center,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Ups, algo sucedió. Cuando realices una actualización o creación, utiliza el botón de actualizar autobuses.',
+                style: TextStyle(fontSize: 14.0),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
         ),
       ),
-    ),
-  ),
-),
       body: BlocProvider(
         create: (context) => BusCubit(
           busRepository: RepositoryProvider.of<BusRepository>(context),
         )..fetchAllBuses(),
         child: const BusListScreen(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider.value(
-                value: BlocProvider.of<BusCubit>(context),
-                child: const AddBusScreen(),
-              ),
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
-
 
 class BusListScreen extends StatelessWidget {
   const BusListScreen({super.key});
@@ -72,7 +55,7 @@ class BusListScreen extends StatelessWidget {
               onPressed: () {
                 busCubit.fetchAllBuses();
               },
-              child: const Text('Acutalizar autobuses'),
+              child: const Text('Actualizar autobuses'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -101,8 +84,9 @@ class BusListScreen extends StatelessWidget {
                     DataColumn(label: Text('Modelo')),
                     DataColumn(label: Text('Capacidad')),
                     DataColumn(label: Text('Tipo')),
+                    DataColumn(label: Text('Compañía')), // Nueva columna para la compañía
                     DataColumn(label: Text('Acciones')),
-                    DataColumn(label: Text('Eliminar')), 
+                    DataColumn(label: Text('Eliminar')),
                   ],
                   rows: buses.map((bus) {
                     return DataRow(cells: [
@@ -111,6 +95,12 @@ class BusListScreen extends StatelessWidget {
                       DataCell(Text(bus.modelo)),
                       DataCell(Text(bus.capacidad)),
                       DataCell(Text(bus.tipo)),
+                      DataCell(
+                        Text(
+                          '${bus.company?.nombre ?? 'N/A'}\n${bus.company?.direccion ?? 'N/A'}\n${bus.company?.telefono ?? 'N/A'}',
+                          style: const TextStyle(fontSize: 12), // Ajusta el tamaño de la fuente si es necesario
+                        ),
+                      ),
                       DataCell(
                         IconButton(
                           icon: const Icon(Icons.edit),
@@ -138,7 +128,7 @@ class BusListScreen extends StatelessWidget {
               } else if (state is BusError) {
                 return Center(child: Text('Error: ${state.message}'));
               }
-              return const Center(child: Text('Press the button to fetch buses'));
+              return const Center(child: Text('Presiona el botón para actualizar autobuses'));
             },
           ),
         ),
@@ -149,7 +139,7 @@ class BusListScreen extends StatelessWidget {
   void _deleteBus(BusCubit busCubit, int busId) async {
     try {
       await busCubit.deleteBus(busId);
-      busCubit.fetchAllBuses(); 
+      busCubit.fetchAllBuses();
     } catch (e) {
       print('Error al eliminar el autobús: $e');
     }
